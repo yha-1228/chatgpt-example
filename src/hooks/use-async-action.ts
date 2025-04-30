@@ -1,20 +1,21 @@
 import { useState } from "react";
 
-import { type AnyAsyncFunction } from "@/types";
+import { type AsyncFunc } from "@/types";
 
-type UseAsyncActionState = {
+export type UseAsyncActionState = {
   pending: boolean;
   isSuccess: boolean;
   isError: boolean;
 };
 
-type UseAsyncActionProps<T extends AnyAsyncFunction> = {
+export type UseAsyncActionProps<T extends AsyncFunc = AsyncFunc> = {
   action: T;
   onSuccess?: (data: Awaited<ReturnType<T>>) => void;
   onError?: (error: Error) => void;
 };
 
-export function useAsyncAction<T extends AnyAsyncFunction>(
+// 非同期処理のアクションを管理する汎用Hook
+export function useAsyncAction<T extends AsyncFunc = AsyncFunc>(
   props: UseAsyncActionProps<T>
 ) {
   const { action, onSuccess, onError } = props;
