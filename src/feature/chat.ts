@@ -7,7 +7,7 @@ import {
   useAsyncAction,
   type UseAsyncActionProps,
 } from "@/hooks/use-async-action";
-import { createId, upsert } from "@/utils";
+import { createId } from "@/utils";
 
 type ChatMessage = {
   id: string;
@@ -28,15 +28,10 @@ export function useChatCreateAction(
   const [chatCreateState, chatCreateAction] = useAsyncAction({
     action: async () => {
       // 自分のメッセージを追加する
-      setChatMessageList((prev) => {
-        const newChatMessage: ChatMessage = {
-          id: createId(),
-          sender: "me",
-          text: inputText,
-        };
-
-        return upsert(prev, newChatMessage, "id");
-      });
+      setChatMessageList((prev) => [
+        ...prev,
+        { id: createId(), sender: "me", text: inputText },
+      ]);
 
       // 自分のメッセージをこれまでのリクエストに加える
       const nextTotalRequestMessages = [
@@ -56,6 +51,11 @@ export function useChatCreateAction(
 
       // ストリームを読み取り、逐次テキストを返答側のメッセージにセットする
       const chatMessageId = createId();
+      setChatMessageList((prev) => [
+        ...prev,
+        { id: chatMessageId, sender: "feedback", text: "" },
+      ]);
+
       let totalContent = "";
 
       for await (const chunk of stream) {
@@ -63,15 +63,15 @@ export function useChatCreateAction(
         if (content === undefined) break;
 
         totalContent = totalContent + content;
-        setChatMessageList((prev) => {
-          const newChatMessage: ChatMessage = {
-            id: chatMessageId,
-            sender: "feedback",
-            text: totalContent,
-          };
-
-          return upsert(prev, newChatMessage, "id");
-        });
+        setChatMessageList((prev) =>
+          prev.map((chatMessage) => {
+            if (chatMessage.id === chatMessageId) {
+              return { ...chatMessage, text: totalContent };
+            } else {
+              return chatMessage;
+            }
+          })
+        );
       }
     },
     onSuccess: callback?.onSuccess,
