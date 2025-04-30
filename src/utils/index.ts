@@ -33,3 +33,7 @@ export function removeDuplicate<T>(records: T[], idName: keyof T) {
 
   return result;
 }
+
+export function upsert<T>(records: T[], newValue: T, idName: keyof T) {
+  return removeDuplicate([...records, newValue], idName);
+}

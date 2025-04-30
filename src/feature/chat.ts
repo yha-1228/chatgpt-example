@@ -7,33 +7,13 @@ import {
   useAsyncAction,
   type UseAsyncActionProps,
 } from "@/hooks/use-async-action";
-import { createId, removeDuplicate } from "@/utils";
+import { createId, upsert } from "@/utils";
 
 type ChatMessage = {
   id: string;
   text: string;
   sender: ChatMarkdownSpeechProps["sender"];
 };
-
-// メッセージ一覧のUIを状態管理するHook
-export function useChatMessageList(initialValue: ChatMessage[] = []) {
-  const [chatMessageList, setChatMessageList] =
-    useState<ChatMessage[]>(initialValue);
-
-  const addChatMessage = (newChatMessage: ChatMessage) => {
-    setChatMessageList((prev) => [...prev, newChatMessage]);
-  };
-
-  const upsertChatMessage = (newChatMessage: ChatMessage) => {
-    setChatMessageList((prev) =>
-      removeDuplicate([...prev, newChatMessage], "id")
-    );
-  };
-
-  return [chatMessageList, addChatMessage, upsertChatMessage] as const;
-}
-
-// ----------------------------------------
 
 export function useChatCreateAction(
   inputText: string,
@@ -43,13 +23,20 @@ export function useChatCreateAction(
     ChatCompletionCreateParamsStreaming["messages"]
   >([]);
 
-  const [chatMessageList, addChatMessage, upsertChatMessage] =
-    useChatMessageList();
+  const [chatMessageList, setChatMessageList] = useState<ChatMessage[]>([]);
 
   const [chatCreateState, chatCreateAction] = useAsyncAction({
     action: async () => {
       // 自分のメッセージを追加する
-      addChatMessage({ id: createId(), sender: "me", text: inputText });
+      setChatMessageList((prev) => {
+        const newChatMessage: ChatMessage = {
+          id: createId(),
+          sender: "me",
+          text: inputText,
+        };
+
+        return upsert(prev, newChatMessage, "id");
+      });
 
       // 自分のメッセージをこれまでのリクエストに加える
       const nextTotalRequestMessages = [
@@ -76,10 +63,14 @@ export function useChatCreateAction(
         if (content === undefined) break;
 
         totalContent = totalContent + content;
-        upsertChatMessage({
-          id: chatMessageId,
-          sender: "feedback",
-          text: totalContent,
+        setChatMessageList((prev) => {
+          const newChatMessage: ChatMessage = {
+            id: chatMessageId,
+            sender: "feedback",
+            text: totalContent,
+          };
+
+          return upsert(prev, newChatMessage, "id");
         });
       }
     },
