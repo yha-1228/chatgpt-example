@@ -15,20 +15,23 @@ type ChatMessage = {
   sender: ChatMarkdownSpeechProps["sender"];
 };
 
-export function useChatCreateAction(
-  inputText: string,
-  callback?: Pick<UseAsyncActionProps, "onSuccess" | "onError">
-) {
+type UseChatCreateActionProps = Pick<
+  UseAsyncActionProps,
+  "onSuccess" | "onError"
+> & { inputText: string };
+
+export function useChatCreateAction(props: UseChatCreateActionProps) {
+  const { inputText, onSuccess, onError } = props;
   const [totalRequestMessages, setTotalRequestMessages] = useState<
     ChatCompletionCreateParamsStreaming["messages"]
   >([]);
 
-  const [chatMessageList, setChatMessageList] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const [chatCreateState, chatCreateAction] = useAsyncAction({
     action: async () => {
       // 自分のメッセージを追加する
-      setChatMessageList((prev) => [
+      setChatMessages((prev) => [
         ...prev,
         { id: createId(), sender: "me", text: inputText },
       ]);
@@ -51,7 +54,7 @@ export function useChatCreateAction(
 
       // ストリームを読み取り、逐次テキストを返答側のメッセージにセットする
       const chatMessageId = createId();
-      setChatMessageList((prev) => [
+      setChatMessages((prev) => [
         ...prev,
         { id: chatMessageId, sender: "feedback", text: "" },
       ]);
@@ -63,7 +66,7 @@ export function useChatCreateAction(
         if (content === undefined) break;
 
         totalContent = totalContent + content;
-        setChatMessageList((prev) =>
+        setChatMessages((prev) =>
           prev.map((chatMessage) => {
             if (chatMessage.id === chatMessageId) {
               return { ...chatMessage, text: totalContent };
@@ -74,13 +77,9 @@ export function useChatCreateAction(
         );
       }
     },
-    onSuccess: callback?.onSuccess,
-    onError: callback?.onError,
+    onSuccess,
+    onError,
   });
 
-  return {
-    chatMessageList,
-    chatCreateState,
-    chatCreateAction,
-  };
+  return { chatMessages: chatMessages, chatCreateState, chatCreateAction };
 }

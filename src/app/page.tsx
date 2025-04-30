@@ -10,8 +10,9 @@ export default function Home() {
   const textFieldRef = useRef<HTMLInputElement | null>(null);
   const [inputText, setInputText] = useState("");
 
-  const { chatMessageList, chatCreateState, chatCreateAction } =
-    useChatCreateAction(inputText, {
+  const { chatMessages, chatCreateState, chatCreateAction } =
+    useChatCreateAction({
+      inputText,
       onSuccess: () => setInputText(""),
       onError: () => alert("Error!"),
     });
@@ -30,7 +31,7 @@ export default function Home() {
       <div className="overflow-y-auto h-[calc(100svh-4rem-5rem)]">
         <Container className="pt-6 pb-10">
           <div className="space-y-6">
-            {chatMessageList.map((chatMessage) => (
+            {chatMessages.map((chatMessage) => (
               // TODO: チャット返答がくる毎に下にスクロールする
               <ChatMarkdownSpeech
                 key={chatMessage.id}
