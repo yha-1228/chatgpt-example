@@ -71,9 +71,10 @@ export function ChatMarkdownSpeech(props: ChatMarkdownSpeechProps) {
           "[&>h2]:text-2xl [&>h2]:font-bold [&>h2]:my-6",
           "[&>h3]:text-xl [&>h3]:font-bold [&>h3]:my-5",
           "[&>h4]:text-lg [&>h4]:font-bold  [&>h4]:my-4",
-          "[&>ul]:list-inside [&>ul]:list-disc [&>ul]:pl-4",
+          "[&>ul]:list-inside [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:my-5",
+          "[&>ol]:list-inside [&>ol]:list-decimal [&>ol]:pl-4 [&>ol]:my-5",
           "[&>ul>li]:-indent-5 [&>ul>li]:pl-3",
-          "[&>ol]:list-inside [&>ol]:list-decimal [&>ol]:pl-4",
+          "[&>ul>ol]:-indent-5 [&>ul>ol]:pl-3",
           "[&>hr]:my-6 [&>hr]:h-0.5 [&>hr]:bg-gray-300 [&>hr]:border-0",
           "[&>p]:my-4"
         )}
