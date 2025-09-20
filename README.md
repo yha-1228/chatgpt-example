@@ -1,3 +1,6 @@
+https://github.com/user-attachments/assets/9b8de303-b012-4364-9974-38c818519fb7
+
+
 ## Getting Started
 
 1. `cp .env.example .env`
