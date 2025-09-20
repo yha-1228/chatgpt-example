@@ -1,5 +1,6 @@
-https://github.com/user-attachments/assets/9b8de303-b012-4364-9974-38c818519fb7
+ChatGPTのAPIを利用してストリーム形式でデータ取得したサンプル
 
+https://github.com/user-attachments/assets/9b8de303-b012-4364-9974-38c818519fb7
 
 ## Getting Started
 
